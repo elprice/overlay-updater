@@ -1,0 +1,3 @@
+.btn-toolbar > button:not(:first-child){
+    margin-left:.5em;
+}
