@@ -1,6 +1,14 @@
 import React, { Component } from 'react';
 import './Home.css';
 import { Container, Row, Col, Button, ButtonToolbar, InputGroup, FormControl } from 'react-bootstrap';
+import Select from 'react-select';
+
+
+const options = [
+  { value: 'Grand Finals' },
+  { value: 'strawberry' },
+  { value: 'vanilla' },
+];
 
 export default class Home extends Component {
 
@@ -85,6 +93,19 @@ export default class Home extends Component {
                 <InputGroup.Append>
                   <Button variant="success" onClick={()=>this.increment('playerTwoWins')}>+</Button>
                 </InputGroup.Append>
+              </InputGroup>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs="12" sm="12" md="12" lg="12" xl="12">
+            <label htmlFor="basic-url">Round</label>
+              <InputGroup className="mb-3">
+                <InputGroup.Prepend>
+                  <InputGroup.Text id="playerOne">
+                    P1
+                  </InputGroup.Text>
+                </InputGroup.Prepend>
+                <FormControl id="playerOneName" aria-describedby="playerOne" value= {this.state.playerOneName} onChange={this.handleChange}/>
               </InputGroup>
             </Col>
           </Row>
