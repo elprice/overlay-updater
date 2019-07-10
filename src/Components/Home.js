@@ -1,14 +1,20 @@
 import React, { Component } from 'react';
 import './Home.css';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { Container, Row, Col, Button, ButtonToolbar, InputGroup, FormControl } from 'react-bootstrap';
-import Select from 'react-select';
-
+import { Typeahead } from 'react-bootstrap-typeahead';
 
 const options = [
-  { value: 'Grand Finals' },
-  { value: 'strawberry' },
-  { value: 'vanilla' },
-];
+  'Loser\'s Rounds',
+  'Loser\'s Quarters',
+  'Loser\'s Semis',
+  'Loser\'s Finals',
+  'Winner\'s Rounds',
+  'Winner\'s Quarters',
+  'Winner\'s Semis',
+  'Winner\'s Finals',
+  'Grand Finals'
+]
 
 export default class Home extends Component {
 
@@ -20,7 +26,8 @@ export default class Home extends Component {
       playerOneName: 'p1',
       playerTwoName: 'p2',
       playerOneWins: 1,
-      playerTwoWins: 2
+      playerTwoWins: 2,
+      round: 'test round'
     }
 
     this.baseState = this.state
@@ -29,13 +36,16 @@ export default class Home extends Component {
   handleChange = (event) =>{
     this.setState({[event.target.id]: event.target.value})
   }
+  handleTypeaheadChange = (name, value) => {
+    this.setState({[name]: value})
+  }
   increment = (name) => {
     this.setState(prevState => ({[name]: ++prevState[name]}))
   }
   decrement = (name) => {
     this.setState(prevState => ({[name]: --prevState[name]}))
   }
-  reset = () => {
+  clear = () => {
     this.setState(this.baseState)
   }
   swapPlayers = () => {
@@ -50,20 +60,19 @@ export default class Home extends Component {
   }
 
   render() {
-
     return (
       <div>
         <Container>
           <Row>
             <Col xs="8" sm="9" md="9" lg="10" xl="10">
-              <label htmlFor="basic-url">Players</label>
+              <label>Players</label>
               <InputGroup className="mb-3">
                 <InputGroup.Prepend>
                   <InputGroup.Text id="playerOne">
                     P1
                   </InputGroup.Text>
                 </InputGroup.Prepend>
-                <FormControl id="playerOneName" aria-describedby="playerOne" value= {this.state.playerOneName} onChange={this.handleChange}/>
+                <FormControl id="playerOneName" aria-describedby="playerOne" value={this.state.playerOneName} onChange={this.handleChange}/>
               </InputGroup>
               <InputGroup className="mb-3">
                 <InputGroup.Prepend>
@@ -71,16 +80,16 @@ export default class Home extends Component {
                     P2
                   </InputGroup.Text>
                 </InputGroup.Prepend>
-                <FormControl id="playerTwoName" aria-describedby="playerTwo" value= {this.state.playerTwoName} onChange={this.handleChange}/>
+                <FormControl id="playerTwoName" aria-describedby="playerTwo" value={this.state.playerTwoName} onChange={this.handleChange}/>
               </InputGroup>
             </Col>
             <Col xs="4" sm="3" md="3" lg="2" xl="2">
-              <label htmlFor="basic-url">Wins</label>
+              <label>Wins</label>
               <InputGroup className="mb-3">
                 <InputGroup.Prepend>
                   <Button {...(this.state.playerOneWins==0?{disabled:'disabled'}:{})} variant="danger" onClick={()=>this.decrement('playerOneWins')}>-</Button>
                 </InputGroup.Prepend>
-                <FormControl className="text-center" id="playerOneWins" placeholder={this.state.playerOneWins} aria-describedby="playerOne" readOnly/>
+                <FormControl className="text-center" id="playerOneWins" value={this.state.playerOneWins} aria-describedby="playerOne" readOnly/>
                 <InputGroup.Append>
                   <Button variant="success" onClick={()=>this.increment('playerOneWins')}>+</Button>
                 </InputGroup.Append>
@@ -89,7 +98,7 @@ export default class Home extends Component {
                 <InputGroup.Prepend>
                   <Button {...(this.state.playerTwoWins==0?{disabled:'disabled'}:{})} variant="danger" onClick={()=>this.decrement('playerTwoWins')}>-</Button>
                 </InputGroup.Prepend>
-                <FormControl className="text-center" id="playerTwoWins" placeholder={this.state.playerTwoWins} aria-describedby="playerTwo" readOnly/>
+                <FormControl className="text-center" id="playerTwoWins" value={this.state.playerTwoWins} aria-describedby="playerTwo" readOnly/>
                 <InputGroup.Append>
                   <Button variant="success" onClick={()=>this.increment('playerTwoWins')}>+</Button>
                 </InputGroup.Append>
@@ -98,22 +107,22 @@ export default class Home extends Component {
           </Row>
           <Row>
             <Col xs="12" sm="12" md="12" lg="12" xl="12">
-            <label htmlFor="basic-url">Round</label>
-              <InputGroup className="mb-3">
-                <InputGroup.Prepend>
-                  <InputGroup.Text id="playerOne">
-                    P1
-                  </InputGroup.Text>
-                </InputGroup.Prepend>
-                <FormControl id="playerOneName" aria-describedby="playerOne" value= {this.state.playerOneName} onChange={this.handleChange}/>
-              </InputGroup>
+              <label>Round</label>
+              <Typeahead className="mb-3"
+                id="round"
+                options={options}
+                value={this.state.round}
+                defaultInputValue={this.state.round}
+                onChange={(value) => this.handleTypeaheadChange('round', value)}
+                onInputChange={(value) => this.handleTypeaheadChange('round', value)}
+              />
             </Col>
           </Row>
           <Row>
             <Col xs="12" sm="12" md="12" lg="12" xl="12">
               <ButtonToolbar>
                 <Button variant="primary" onClick={this.swapPlayers}>Swap</Button>
-                <Button variant="secondary" onClick={this.reset}>Reset</Button>
+                <Button variant="secondary" onClick={this.clear}>Clear</Button>
               </ButtonToolbar>
             </Col>
           </Row>
