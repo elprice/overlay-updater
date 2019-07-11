@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import './Home.css';
-import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { Container, Row, Col, Button, ButtonToolbar, InputGroup, FormControl } from 'react-bootstrap';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import Autosuggest from 'react-autosuggest';
 
-const options = [
+/*const suggestions = [
   'Loser\'s Rounds',
   'Loser\'s Quarters',
   'Loser\'s Semis',
@@ -14,7 +13,50 @@ const options = [
   'Winner\'s Semis',
   'Winner\'s Finals',
   'Grand Finals'
+]*/
+
+const suggestions = [
+  'aa',
+  'ca',
+  'ba'
 ]
+
+
+const theme = {
+  container: 'autosuggest',
+  input: 'form-control',
+  suggestionsContainer: 'dropdown',
+  suggestionsList: `dropdown-menu ${suggestions.length ? 'show' : ''}`,
+  suggestion: 'dropdown-item',
+  suggestionFocused: 'active'
+}
+
+// https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions#Using_Special_Characters
+function escapeRegexCharacters(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function getSuggestions(value) {
+  const escapedValue = escapeRegexCharacters(value.trim())
+  
+  if (escapedValue === '') {
+    return []
+  }
+
+  const regex = new RegExp('^' + escapedValue, 'i');
+
+  return suggestions
+}
+
+function getSuggestionValue(suggestion) {
+  return suggestion
+}
+
+function renderSuggestion(suggestion) {
+  return (
+    <span>{suggestion}</span>
+  )
+}
 
 export default class Home extends Component {
 
@@ -23,22 +65,16 @@ export default class Home extends Component {
 
     /*TODO test data*/
     this.state = {
-      playerOneName: 'p1',
-      playerTwoName: 'p2',
+      playerOneName: 'asd',
+      playerTwoName: 'q',
       playerOneWins: 1,
       playerTwoWins: 2,
-      round: 'test round'
+      round: 'z'
     }
 
     this.baseState = this.state
   }
   
-  handleChange = (event) =>{
-    this.setState({[event.target.id]: event.target.value})
-  }
-  handleTypeaheadChange = (name, value) => {
-    this.setState({[name]: value})
-  }
   increment = (name) => {
     this.setState(prevState => ({[name]: ++prevState[name]}))
   }
@@ -58,8 +94,46 @@ export default class Home extends Component {
       [second]: prevState[first]
     }))
   }
+  onChange = (event, { newValue, method }) => {
+    this.setState({
+      [event.target.id]: newValue
+    })
+  }
+  onSuggestionsFetchRequested = ({ value }) => {
+    this.setState({
+      suggestions: getSuggestions(value)
+    })
+  }
+  onSuggestionsClearRequested = () => {
+    this.setState({
+      suggestions: []
+    })
+  }
+  onSuggestionSelected = (name, {suggestion, suggestionValue}) =>{
+    this.setState({
+      [name]: suggestionValue
+    })
+};
 
   render() {
+
+    const { playerOneName, playerTwoName, round } = this.state
+    const playerOneInputProps = {
+      id: 'playerOneName',
+      value: playerOneName,
+      onChange: this.onChange
+    }
+    const playerTwoInputProps = {
+      id: 'playerTwoName',
+      value: playerTwoName,
+      onChange: this.onChange
+    }
+    const roundInputProps = {
+      id: 'round',
+      value: round,
+      onChange: this.onChange
+    }
+
     return (
       <div>
         <Container>
@@ -72,7 +146,16 @@ export default class Home extends Component {
                     P1
                   </InputGroup.Text>
                 </InputGroup.Prepend>
-                <FormControl id="playerOneName" aria-describedby="playerOne" value={this.state.playerOneName} onChange={this.handleChange}/>
+                <Autosuggest theme={theme}
+                  id={playerOneInputProps.id}
+                  suggestions={suggestions}
+                  onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                  onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                  getSuggestionValue={getSuggestionValue}
+                  renderSuggestion={renderSuggestion}
+                  onSuggestionSelected={(e,suggestion)=>this.onSuggestionSelected(playerOneInputProps.id,suggestion)}
+                  inputProps={playerOneInputProps} 
+                />
               </InputGroup>
               <InputGroup className="mb-3">
                 <InputGroup.Prepend>
@@ -80,7 +163,16 @@ export default class Home extends Component {
                     P2
                   </InputGroup.Text>
                 </InputGroup.Prepend>
-                <FormControl id="playerTwoName" aria-describedby="playerTwo" value={this.state.playerTwoName} onChange={this.handleChange}/>
+                <Autosuggest theme={theme}
+                  id={playerTwoInputProps.id}
+                  suggestions={suggestions}
+                  onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                  onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                  getSuggestionValue={getSuggestionValue}
+                  renderSuggestion={renderSuggestion}
+                  onSuggestionSelected={(e,suggestion)=>this.onSuggestionSelected(playerTwoInputProps.id,suggestion)}
+                  inputProps={playerTwoInputProps} 
+                />              
               </InputGroup>
             </Col>
             <Col xs="4" sm="3" md="3" lg="2" xl="2">
@@ -105,24 +197,31 @@ export default class Home extends Component {
               </InputGroup>
             </Col>
           </Row>
-          <Row>
+          <Row className='mb-3'>
             <Col xs="12" sm="12" md="12" lg="12" xl="12">
               <label>Round</label>
-              <Typeahead className="mb-3"
-                id="round"
-                options={options}
-                value={this.state.round}
-                defaultInputValue={this.state.round}
-                onChange={(value) => this.handleTypeaheadChange('round', value)}
-                onInputChange={(value) => this.handleTypeaheadChange('round', value)}
+              <Autosuggest theme={theme}
+                id={roundInputProps.id}
+                suggestions={suggestions}
+                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                getSuggestionValue={getSuggestionValue}
+                renderSuggestion={renderSuggestion}
+                onSuggestionSelected={(e,suggestion)=>this.onSuggestionSelected(roundInputProps.id,suggestion)}
+                inputProps={roundInputProps} 
               />
             </Col>
           </Row>
           <Row>
-            <Col xs="12" sm="12" md="12" lg="12" xl="12">
+            <Col xs="4" sm="4" md="4" lg="4" xl="4">
               <ButtonToolbar>
-                <Button variant="primary" onClick={this.swapPlayers}>Swap</Button>
-                <Button variant="secondary" onClick={this.clear}>Clear</Button>
+                <Button variant="primary" onClick={this.update}>Update</Button>
+              </ButtonToolbar>
+            </Col>
+            <Col xs="8" sm="8" md="8" lg="8" xl="8">
+              <ButtonToolbar className="float-right">
+                <Button variant="secondary" onClick={this.swapPlayers}>Swap</Button>
+                <Button variant="danger" onClick={this.clear}>Clear</Button>
               </ButtonToolbar>
             </Col>
           </Row>
