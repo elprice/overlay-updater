@@ -15,37 +15,23 @@ import Autosuggest from 'react-autosuggest';
   'Grand Finals'
 ]*/
 
-const suggestions = [
+const samples = [
   'aa',
   'ca',
   'ba'
 ]
 
-
 const theme = {
   container: 'autosuggest',
   input: 'form-control',
   suggestionsContainer: 'dropdown',
-  suggestionsList: `dropdown-menu ${suggestions.length ? 'show' : ''}`,
+  suggestionsList: `dropdown-menu ${samples.length ? 'show' : ''}`,
   suggestion: 'dropdown-item',
   suggestionFocused: 'active'
 }
 
-// https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions#Using_Special_Characters
-function escapeRegexCharacters(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
 function getSuggestions(value) {
-  const escapedValue = escapeRegexCharacters(value.trim())
-  
-  if (escapedValue === '') {
-    return []
-  }
-
-  const regex = new RegExp('^' + escapedValue, 'i');
-
-  return suggestions
+  return value.length === 0 ? samples : samples.filter(sug => sug.toLowerCase().slice(0, value.length) === value)
 }
 
 function getSuggestionValue(suggestion) {
@@ -56,6 +42,10 @@ function renderSuggestion(suggestion) {
   return (
     <span>{suggestion}</span>
   )
+}
+
+function shouldRenderSuggestions(value) {
+  return true;
 }
 
 export default class Home extends Component {
@@ -69,7 +59,8 @@ export default class Home extends Component {
       playerTwoName: 'q',
       playerOneWins: 1,
       playerTwoWins: 2,
-      round: 'z'
+      round: 'z',
+      suggestions: samples
     }
 
     this.baseState = this.state
@@ -88,13 +79,13 @@ export default class Home extends Component {
     this.swap('playerOneWins', 'playerTwoWins')
     this.swap('playerOneName', 'playerTwoName')
   }
-  swap = (first, second) =>{
+  swap = (first, second) => {
     this.setState(prevState=> ({
       [first]: prevState[second],
       [second]: prevState[first]
     }))
   }
-  onChange = (event, { newValue, method }) => {
+  onChange = (event, { newValue }) => {
     this.setState({
       [event.target.id]: newValue
     })
@@ -117,7 +108,7 @@ export default class Home extends Component {
 
   render() {
 
-    const { playerOneName, playerTwoName, round } = this.state
+    const { playerOneName, playerTwoName, round, suggestions } = this.state
     const playerOneInputProps = {
       id: 'playerOneName',
       value: playerOneName,
@@ -154,6 +145,7 @@ export default class Home extends Component {
                   getSuggestionValue={getSuggestionValue}
                   renderSuggestion={renderSuggestion}
                   onSuggestionSelected={(e,suggestion)=>this.onSuggestionSelected(playerOneInputProps.id,suggestion)}
+                  shouldRenderSuggestions={shouldRenderSuggestions}
                   inputProps={playerOneInputProps} 
                 />
               </InputGroup>
@@ -171,6 +163,7 @@ export default class Home extends Component {
                   getSuggestionValue={getSuggestionValue}
                   renderSuggestion={renderSuggestion}
                   onSuggestionSelected={(e,suggestion)=>this.onSuggestionSelected(playerTwoInputProps.id,suggestion)}
+                  shouldRenderSuggestions={shouldRenderSuggestions}
                   inputProps={playerTwoInputProps} 
                 />              
               </InputGroup>
@@ -208,6 +201,7 @@ export default class Home extends Component {
                 getSuggestionValue={getSuggestionValue}
                 renderSuggestion={renderSuggestion}
                 onSuggestionSelected={(e,suggestion)=>this.onSuggestionSelected(roundInputProps.id,suggestion)}
+                shouldRenderSuggestions={shouldRenderSuggestions}
                 inputProps={roundInputProps} 
               />
             </Col>
