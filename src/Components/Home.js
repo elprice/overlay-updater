@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import './Home.css';
 import { Container, Row, Col, Button, ButtonToolbar, InputGroup, FormControl } from 'react-bootstrap';
 import Autosuggest from 'react-autosuggest';
+import AutosuggestHighlightMatch from 'autosuggest-highlight/match'
+import AutosuggestHighlightParse from 'autosuggest-highlight/parse'
 
-/*const suggestions = [
+
+const samples = [
   'Loser\'s Rounds',
   'Loser\'s Quarters',
   'Loser\'s Semis',
@@ -13,12 +16,6 @@ import Autosuggest from 'react-autosuggest';
   'Winner\'s Semis',
   'Winner\'s Finals',
   'Grand Finals'
-]*/
-
-const samples = [
-  'aa',
-  'ca',
-  'ba'
 ]
 
 const theme = {
@@ -31,16 +28,29 @@ const theme = {
 }
 
 function getSuggestions(value) {
-  return value.length === 0 ? samples : samples.filter(sug => sug.toLowerCase().slice(0, value.length) === value)
+  const val = value.toLowerCase();
+  return val.length === 0 ? samples : samples.filter(sug => sug.toLowerCase().slice(0, val.length) === val)
 }
 
 function getSuggestionValue(suggestion) {
   return suggestion
 }
 
-function renderSuggestion(suggestion) {
+function renderSuggestion(suggestion, {query}) {
+  const matches = AutosuggestHighlightMatch(suggestion, query)
+  const parts = AutosuggestHighlightParse(suggestion, matches)
   return (
-    <span>{suggestion}</span>
+    <span>
+     {
+        parts.map((part, index) => {
+          const className = part.highlight ? 'highlight' : null;
+
+          return (
+            <span className={className} key={index}>{part.text}</span>
+          );
+        })
+      }
+    </span>
   )
 }
 
@@ -109,6 +119,7 @@ export default class Home extends Component {
   render() {
 
     const { playerOneName, playerTwoName, round, suggestions } = this.state
+
     const playerOneInputProps = {
       id: 'playerOneName',
       value: playerOneName,

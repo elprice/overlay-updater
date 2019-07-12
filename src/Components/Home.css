@@ -7,7 +7,6 @@
     border-bottom-left-radius: 0;
 }
 
-
 .input-group>div.autosuggest{
     position: relative;
     flex: 1 122 auto;
@@ -45,3 +44,9 @@
     border-top-right-radius: 0;
     width:100%;
 }
+
+.highlight {
+    color: #120000;
+    font-weight: bold;
+}
+

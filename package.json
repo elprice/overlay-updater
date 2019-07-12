@@ -5,6 +5,7 @@
   "homepage": "./",
   "main": "src/start.js",
   "dependencies": {
+    "autosuggest-highlight": "^3.1.1",
     "bootstrap": "^4.3.1",
     "electron": "^5.0.6",
     "eslint-config-airbnb": "^17.1.1",

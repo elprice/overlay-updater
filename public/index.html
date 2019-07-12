@@ -25,21 +25,7 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
-    <script>
-      const { remote } = require('electron')
-      const { Menu, MenuItem } = remote
-      
-      const menu = new Menu()
-      menu.append(new MenuItem({ label: 'MenuItem1', click() { console.log('item 1 clicked') } }))
-      menu.append(new MenuItem({ type: 'separator' }))
-      menu.append(new MenuItem({ label: 'MenuItem2', type: 'checkbox', checked: true }))
-      
-      window.addEventListener('contextmenu', (e) => {
-        e.preventDefault()
-        menu.popup({ window: remote.getCurrentWindow() })
-      }, false)
-      </script>
+    <title>overlay</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
