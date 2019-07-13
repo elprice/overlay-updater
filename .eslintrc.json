@@ -27,7 +27,8 @@
       "semi": [
         "error",
         "never"
-      ]
+      ],
+      "linebreak-style":["error", "windows"]
     },
     "parser": "babel-eslint",
     "extends": "airbnb",

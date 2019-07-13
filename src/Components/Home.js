@@ -4,6 +4,7 @@ import { Container, Row, Col, Button, ButtonToolbar, InputGroup, FormControl } f
 import Autosuggest from 'react-autosuggest'
 import AutosuggestHighlightMatch from 'autosuggest-highlight/match'
 import AutosuggestHighlightParse from 'autosuggest-highlight/parse'
+import fs from 'fs'
 
 const players = [
   'jambi',
@@ -75,11 +76,11 @@ const write = (state) => {
   console.log(fs)
   //hard code all of these?
   try { 
-    //fs.writeFileSync('./output/playerOneName.txt', state.playerOneName, 'utf-8')
-    //fs.writeFileSync('./output/playerOneWins.txt', state.playerOneWins, 'utf-8')
-    //fs.writeFileSync('./output/playerTwoName.txt', state.playerTwoName, 'utf-8')
-    //fs.writeFileSync('./output/playerTwoWins.txt', state.playerTwoWins, 'utf-8')
-    //fs.writeFileSync('./output/round.txt', state.round, 'utf-8')
+    fs.writeFileSync('./playerOneName.txt', state.playerOneName, 'utf-8')
+    fs.writeFileSync('./playerOneWins.txt', state.playerOneWins, 'utf-8')
+    fs.writeFileSync('./playerTwoName.txt', state.playerTwoName, 'utf-8')
+    fs.writeFileSync('./playerTwoWins.txt', state.playerTwoWins, 'utf-8')
+    fs.writeFileSync('./round.txt', state.round, 'utf-8')
   }
   catch(e) { 
     console.error('Failed to save files. \n' + e) 
@@ -249,7 +250,7 @@ export default class Home extends Component {
           <Row>
             <Col xs="4" sm="4" md="4" lg="4" xl="4">
               <ButtonToolbar>
-                <Button variant="primary" onClick={write}>Update</Button>
+                <Button variant="primary" onClick={()=>write(this.state)}>Update</Button>
               </ButtonToolbar>
             </Col>
             <Col xs="8" sm="8" md="8" lg="8" xl="8">
