@@ -1,12 +1,16 @@
-import React, { Component } from 'react';
-import './Home.css';
-import { Container, Row, Col, Button, ButtonToolbar, InputGroup, FormControl } from 'react-bootstrap';
-import Autosuggest from 'react-autosuggest';
+import React, { Component } from 'react'
+import './Home.css'
+import { Container, Row, Col, Button, ButtonToolbar, InputGroup, FormControl } from 'react-bootstrap'
+import Autosuggest from 'react-autosuggest'
 import AutosuggestHighlightMatch from 'autosuggest-highlight/match'
 import AutosuggestHighlightParse from 'autosuggest-highlight/parse'
 
+const players = [
+  'jambi',
+  'toaster'
+]
 
-const samples = [
+const rounds = [
   'Loser\'s Rounds',
   'Loser\'s Quarters',
   'Loser\'s Semis',
@@ -18,44 +22,68 @@ const samples = [
   'Grand Finals'
 ]
 
-const theme = {
+const playersTheme = {
   container: 'autosuggest',
   input: 'form-control',
   suggestionsContainer: 'dropdown',
-  suggestionsList: `dropdown-menu ${samples.length ? 'show' : ''}`,
+  suggestionsList: `dropdown-menu ${players.length ? 'show' : ''}`,
   suggestion: 'dropdown-item',
   suggestionFocused: 'active'
 }
 
-function getSuggestions(value) {
-  const val = value.toLowerCase();
-  return val.length === 0 ? samples : samples.filter(sug => sug.toLowerCase().slice(0, val.length) === val)
+const roundsTheme = {
+  container: 'autosuggest',
+  input: 'form-control',
+  suggestionsContainer: 'dropdown',
+  suggestionsList: `dropdown-menu ${rounds.length ? 'show' : ''}`,
+  suggestion: 'dropdown-item',
+  suggestionFocused: 'active'
 }
 
-function getSuggestionValue(suggestion) {
+const getSuggestions = (name, value) => {
+  const val = value.toLowerCase();
+  if(name == 'players') return val.length === 0 ? players : players.filter(sug => sug.toLowerCase().slice(0, val.length) === val)
+  if(name == 'rounds')  return val.length === 0 ? rounds : rounds.filter(sug => sug.toLowerCase().slice(0, val.length) === val)
+}
+
+const getSuggestionValue = (suggestion) => {
   return suggestion
 }
 
-function renderSuggestion(suggestion, {query}) {
+const renderSuggestion = (suggestion, {query}) => {
   const matches = AutosuggestHighlightMatch(suggestion, query)
   const parts = AutosuggestHighlightParse(suggestion, matches)
   return (
     <span>
      {
         parts.map((part, index) => {
-          const className = part.highlight ? 'highlight' : null;
-
+          const className = part.highlight ? 'highlight' : null
           return (
             <span className={className} key={index}>{part.text}</span>
-          );
+          )
         })
       }
     </span>
   )
 }
 
-function shouldRenderSuggestions(value) {
-  return true;
+const shouldRenderSuggestions = (value) => {
+  return true
+}
+
+const write = (state) => {
+  console.log(fs)
+  //hard code all of these?
+  try { 
+    //fs.writeFileSync('./output/playerOneName.txt', state.playerOneName, 'utf-8')
+    //fs.writeFileSync('./output/playerOneWins.txt', state.playerOneWins, 'utf-8')
+    //fs.writeFileSync('./output/playerTwoName.txt', state.playerTwoName, 'utf-8')
+    //fs.writeFileSync('./output/playerTwoWins.txt', state.playerTwoWins, 'utf-8')
+    //fs.writeFileSync('./output/round.txt', state.round, 'utf-8')
+  }
+  catch(e) { 
+    console.error('Failed to save files. \n' + e) 
+  }
 }
 
 export default class Home extends Component {
@@ -70,7 +98,8 @@ export default class Home extends Component {
       playerOneWins: 1,
       playerTwoWins: 2,
       round: 'z',
-      suggestions: samples
+      players: players,
+      rounds: rounds
     }
 
     this.baseState = this.state
@@ -82,7 +111,7 @@ export default class Home extends Component {
   decrement = (name) => {
     this.setState(prevState => ({[name]: --prevState[name]}))
   }
-  clear = () => {
+  clearAll = () => {
     this.setState(this.baseState)
   }
   swapPlayers = () => {
@@ -100,25 +129,25 @@ export default class Home extends Component {
       [event.target.id]: newValue
     })
   }
-  onSuggestionsFetchRequested = ({ value }) => {
+  onSuggestionsFetchRequested = (name, { value }) => {
     this.setState({
-      suggestions: getSuggestions(value)
+      [name]: getSuggestions(name, value)
     })
   }
-  onSuggestionsClearRequested = () => {
+  clear = (name) => {
     this.setState({
-      suggestions: []
+      [name]: []
     })
   }
   onSuggestionSelected = (name, {suggestion, suggestionValue}) =>{
     this.setState({
       [name]: suggestionValue
     })
-};
+}
 
   render() {
 
-    const { playerOneName, playerTwoName, round, suggestions } = this.state
+    const { playerOneName, playerTwoName, round, players, rounds } = this.state
 
     const playerOneInputProps = {
       id: 'playerOneName',
@@ -148,11 +177,11 @@ export default class Home extends Component {
                     P1
                   </InputGroup.Text>
                 </InputGroup.Prepend>
-                <Autosuggest theme={theme}
+                <Autosuggest theme={playersTheme}
                   id={playerOneInputProps.id}
-                  suggestions={suggestions}
-                  onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                  onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                  suggestions={players}
+                  onSuggestionsFetchRequested={(e) => this.onSuggestionsFetchRequested('players', e)}
+                  onSuggestionsClearRequested={() => this.clear('players')}
                   getSuggestionValue={getSuggestionValue}
                   renderSuggestion={renderSuggestion}
                   onSuggestionSelected={(e,suggestion)=>this.onSuggestionSelected(playerOneInputProps.id,suggestion)}
@@ -166,11 +195,11 @@ export default class Home extends Component {
                     P2
                   </InputGroup.Text>
                 </InputGroup.Prepend>
-                <Autosuggest theme={theme}
+                <Autosuggest theme={playersTheme}
                   id={playerTwoInputProps.id}
-                  suggestions={suggestions}
-                  onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                  onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                  suggestions={players}
+                  onSuggestionsFetchRequested={(e) => this.onSuggestionsFetchRequested('players', e)}
+                  onSuggestionsClearRequested={() => this.clear('players')}
                   getSuggestionValue={getSuggestionValue}
                   renderSuggestion={renderSuggestion}
                   onSuggestionSelected={(e,suggestion)=>this.onSuggestionSelected(playerTwoInputProps.id,suggestion)}
@@ -204,11 +233,11 @@ export default class Home extends Component {
           <Row className='mb-3'>
             <Col xs="12" sm="12" md="12" lg="12" xl="12">
               <label>Round</label>
-              <Autosuggest theme={theme}
+              <Autosuggest theme={roundsTheme}
                 id={roundInputProps.id}
-                suggestions={suggestions}
-                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                suggestions={rounds}
+                onSuggestionsFetchRequested={(e) => this.onSuggestionsFetchRequested('rounds', e)}
+                onSuggestionsClearRequested={() => this.clear('rounds')}
                 getSuggestionValue={getSuggestionValue}
                 renderSuggestion={renderSuggestion}
                 onSuggestionSelected={(e,suggestion)=>this.onSuggestionSelected(roundInputProps.id,suggestion)}
@@ -220,18 +249,18 @@ export default class Home extends Component {
           <Row>
             <Col xs="4" sm="4" md="4" lg="4" xl="4">
               <ButtonToolbar>
-                <Button variant="primary" onClick={this.update}>Update</Button>
+                <Button variant="primary" onClick={write}>Update</Button>
               </ButtonToolbar>
             </Col>
             <Col xs="8" sm="8" md="8" lg="8" xl="8">
               <ButtonToolbar className="float-right">
                 <Button variant="secondary" onClick={this.swapPlayers}>Swap</Button>
-                <Button variant="danger" onClick={this.clear}>Clear</Button>
+                <Button variant="danger" onClick={this.clearAll}>Clear</Button>
               </ButtonToolbar>
             </Col>
           </Row>
         </Container>
       </div>
-    );
+    )
   }
 }
